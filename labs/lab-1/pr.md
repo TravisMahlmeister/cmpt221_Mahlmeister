@@ -47,8 +47,9 @@ If this is the first time you're pushing to this github account from this machin
 
 ```bash
 # create upstream (remote tracking branch) for your current local branch
-git push --set-upstream origin lab-1
 git push -u origin lab-1
+git push --set-upstream origin lab-1
+
 ```
 
 Once you have pushed your new file and you're ready to submit it, go to your `cmpt221` repository and click `Pull requests` in the top menu bar. Click `New pull request`. Make sure your OWN project is selected (not mine) and keep the `base:main`, and select the branch you'd like to compare: `compare:lab-1`. Then click `Create pull request`. Add a title and a description, and click `Create pull request`. 
