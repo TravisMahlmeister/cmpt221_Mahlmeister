@@ -19,10 +19,10 @@ class Course(db.Model):
 
     def __repr__(self):
         return f"""
-            "COURSE NAME: {self.CourseName},
+             "COURSE NAME: {self.CourseName},
              SEMESTER: {self.Semester},
              YEAR: {self.Year}
-        """
+            """
     
     def __repr__(self):
         return self.__repr__()
