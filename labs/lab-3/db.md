@@ -18,7 +18,7 @@
     ```
 
 ### Lab - Part 1
-In order to connect to a database, you need to _create_ a database. We'll be creating our database in Postgres, so go ahead and download pgAdmin4: https://www.pgadmin.org/download/
+In order to connect to a database, you need to _create_ a database. We'll be creating our database in Postgres, so go ahead and download PostgreSQL and pgAdmin4: https://www.postgresql.org/download/
 
 Open the application and follow the set-up instructions. You'll have to set a password for the user `postgres`. **Remember this password.** Once you're set up, you can create your database by following these instructions:
 
@@ -122,7 +122,7 @@ A many to many relationship means we need to create an association/join table. I
 
 In this case, we just want the course foreign key and the professor foreign key. We don't want to store any additional information, so we are going with option 1.
 
-The association table has been created for you in `lab-3/db/schema/assoc.py`. Go ahead and review it, then uncomment line 27 in `lab-3/db/db.py`. 
+The association table has been created for you in `lab-3/db/schema/professorcourse.py`. Go ahead and review it, then uncomment line 27 in `lab-3/db/server.py`. 
 
 **Save your changes**, then, go to pgAdmin4, right click on `Tables` and hit `Refresh`. You should see your association table.
 
