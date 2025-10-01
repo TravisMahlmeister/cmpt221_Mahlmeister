@@ -24,7 +24,11 @@ def insert_professors():
     session = get_session()
     try:
         # TODO: create three professor objects
+        professor1 = Professor(FirstName="Alex", LastName="Mahlmeister", Email="Alex.Mahlmeister1@marist.edu")
+        professor2 = Professor(FirstName="Cooper", LastName="Mahlmeister", Email="Cooper.Mahlmeister1@marist.edu")
+        professor3 = Professor(FirstName="Ryan", LastName="Mahlmeister", Email="Ryan.Mahlmeister1@marist.edu")
         # TODO: use the sqlalchemy orm to insert the new records as a list of professor objects
+        session.add_all([professor1, professor2, professor3])
         # "save" the changes
         session.commit()
 
@@ -40,9 +44,14 @@ def update_professor():
     session = get_session()
     try:
         # TODO: get professor to be updated (would ideally be a parameter)
+        professor = session.query(Professor).filter(Professor.ProfessorID == 2).one_or_none()
         # TODO: use the sqlalchemy orm to update 1 record
-        # "save" the changes
-        session.commit()
+        if professor:
+            professor.FirstName = "Cali"
+            # "save" the changes
+            session.commit()
+        else:
+            print(f"No professor found with that ID")
     
     except Exception as e:
         session.rollback()
@@ -56,9 +65,15 @@ def delete_professor():
     session = get_session()
     try:
         # TODO: get professor to be deleted (would ideally be a parameter)
-        # TODO: use the sqlalchemy orm to delete 1 record
-        # "save" the changes
-        session.commit()
+        professor = session.query(Professor).filter(Professor.ProfessorID == 3).one_or_none()
+
+        if professor:
+            session.delete(professor)
+            # TODO: use the sqlalchemy orm to delete 1 record
+            # "save" the changes
+            session.commit()
+        else:
+            print(f"No professor foudn with that ID")
 
     except Exception as e:
         session.rollback()
