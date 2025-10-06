@@ -34,10 +34,9 @@ def get_session():
 def init_database():
     """Initialize database tables"""
     try:
-        # import all of the tables
-        from db.schema import Course, Professor, ProfessorCourse
+        # import tables here
         
-        # create all of the tables
+        # create tables
         Base.metadata.create_all(bind=engine)
         print(f"\n\n----------- Connection successful!")
         print(f" * Connected to database: {db_name}")

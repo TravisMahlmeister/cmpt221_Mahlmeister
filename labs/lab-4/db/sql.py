@@ -4,7 +4,6 @@ from db.server import get_session
 
 """Lab 4 - Part 1:
 - Insert 3 records into the Courses table
-- Select all records from the Courses table
 - Update 1 record in the Courses table
 - Delete 1 record in the Courses table
 """
