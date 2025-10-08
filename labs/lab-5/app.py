@@ -35,14 +35,26 @@ def create_app():
     # ===============================================================
 
     # create a webpage based off of the html in templates/index.html
+
     @app.route('/')
     def index():
         """Home page"""
-        return render_template('index.html')
+        return render_template("index.html")
+        
     
     # add more routes here!
+    @app.route('/example')
+    def example():
+        return render_template("example.html")
 
+    @app.route('/picture')
+    def picture():
+        return render_template("picture.html")
+    
     return app
+
+    
+    
 
 if __name__ == "__main__":
     app = create_app()
