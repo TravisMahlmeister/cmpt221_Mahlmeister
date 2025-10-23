@@ -2,10 +2,12 @@
 
 import os
 from dotenv import load_dotenv
-from flask import Flask, render_template
-from db.query import get_all
-from db.server import init_database
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from db.query import get_all, insert
+from db.server import init_database, get_session
 from db.schema import Users
+from sqlalchemy import func
+
 
 # load environment variables from .env
 load_dotenv()
@@ -25,6 +27,7 @@ def create_app():
     
     # connect to db
     app.config["SQLALCHEMY_DATABASE_URI"] = db_url
+    app.config["SECRET_KEY"] = "something-random-and-secure"
     
     # Initialize database
     with app.app_context():
@@ -42,18 +45,48 @@ def create_app():
         """Home page"""
         return render_template('index.html')
     
-    @app.route('/signup')
+    @app.route('/signup', methods=['GET', 'POST'])
     def signup():
         """Sign up page: enables users to sign up"""
+        if request.method == 'POST':
+            try:
+                user = Users(FirstName=request.form["FirstName"],
+                            LastName=request.form["LastName"],
+                            Email=request.form["Email"],
+                            PhoneNumber=request.form["PhoneNumber"],
+                            Password=request.form["Password"])
+
+                insert(user)
+                return redirect(url_for('index'))
+            except Exception as e:
+                print("Error adding user", e)
+                return redirect(url_for('signup'))
+
+            
         #TODO: implement sign up logic here
 
         return render_template('signup.html')
     
-    @app.route('/login')
+    @app.route('/login', methods=['GET', 'POST'])
     def login():
         """Log in page: enables users to log in"""
         # TODO: implement login logic here
+        if request.method == 'POST':
+            email = request.form.get('Email').strip().lower()
+            password = request.form.get('Password')
+            
+            if not email or not password:
+                flash('Please enter your right email and password!')
+                return render_template('login.html', error = "Please enter both email and password")
 
+            with get_session() as s:
+                user = s.query(Users).filter(func.lower(Users.Email) == email).first()
+                if user and user.Password == password:
+                    flash('Login Successful')
+                    return redirect(url_for('index'))
+                else:
+                    return render_template('login.html')
+            
         return render_template('login.html')
 
     @app.route('/users')
