@@ -7,10 +7,19 @@ from db.query import get_all, insert
 from db.server import init_database, get_session
 from db.schema import Users
 from sqlalchemy import func
+import logging
+import bcrypt
 
 
 # load environment variables from .env
 load_dotenv()
+os.makedirs("logs",exist_ok=True)
+logging.basicConfig(
+    filename="logs/log.txt",
+    level=logging.INFO,
+    filemode="a",
+    format="%(asctime)s | %(levelname)s | %(message)s"
+)
 
 # database connection - values set in .env
 db_name = os.getenv('db_name')
@@ -49,21 +58,55 @@ def create_app():
     def signup():
         """Sign up page: enables users to sign up"""
         if request.method == 'POST':
+
+            firstName = (request.form.get("FirstName") or "" ).strip()
+            lastName = (request.form.get("LastName") or "" ).strip()
+            email = (request.form.get("Email") or "" ).strip().lower()
+            phonenum = (request.form.get("PhoneNumber") or "" ).strip()
+            password = (request.form.get("Password") or "" ).strip()
+
+            is_valid = True
+            error_msg = None
+
+            if not firstName or not firstName.isalpha():
+                is_valid = False
+                error_msg = "First Name must contain only letters."
+            elif not lastName or not lastName.isalpha():
+                is_valid =False
+                error_msg = "Last name must only contain letters."
+            elif not phonenum.isnumeric() or len(phonenum) != 10:
+                is_valid = False
+                error_msg = "Phone number must be 10 digits"
+            elif not password:
+                is_valid = False
+                error_msg = "Password is required to have"
+            elif ("@" not in email) or ("." not in email.split("@")[-1]):
+                is_valid = False
+                error_msg = "Please enter a valid email"
+            
+            if not is_valid:
+                logging.warning(f"Signup failed")
+
             try:
-                user = Users(FirstName=request.form["FirstName"],
-                            LastName=request.form["LastName"],
-                            Email=request.form["Email"],
-                            PhoneNumber=request.form["PhoneNumber"],
-                            Password=request.form["Password"])
+                hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+            except Exception:
+                logging.error(f"Password hashing failed ")
+
+            try:
+                user = Users(
+                    FirstName=firstName,
+                    LastName=lastName,
+                    Email=email,
+                    PhoneNumber=phonenum,
+                    Password=hashed_password)
 
                 insert(user)
                 return redirect(url_for('index'))
             except Exception as e:
                 print("Error adding user", e)
                 return redirect(url_for('signup'))
-
-            
-        #TODO: implement sign up logic here
+                
+            #TODO: implement sign up logic here
 
         return render_template('signup.html')
     
@@ -72,21 +115,25 @@ def create_app():
         """Log in page: enables users to log in"""
         # TODO: implement login logic here
         if request.method == 'POST':
-            email = request.form.get('Email').strip().lower()
-            password = request.form.get('Password')
-            
+            email = (request.form.get('Email') or "").strip().lower()
+            password = (request.form.get('Password') or "").strip()
+                
             if not email or not password:
-                flash('Please enter your right email and password!')
+                logging.warning(f"Loging failed.")
                 return render_template('login.html', error = "Please enter both email and password")
 
-            with get_session() as s:
-                user = s.query(Users).filter(func.lower(Users.Email) == email).first()
-                if user and user.Password == password:
-                    flash('Login Successful')
-                    return redirect(url_for('index'))
-                else:
-                    return render_template('login.html')
-            
+            try:
+                with get_session() as s:
+                    user = s.query(Users).filter(func.lower(Users.Email) == email).first()
+                    if user:
+                        stored_hash = (user.Password or "").encode("utf-8")
+                        if stored_hash and bcrypt.checkpw(password.encode("utf-8"), stored_hash):
+                            logging.info(f"Logged In.")
+                            return redirect(url_for('index'))
+            except Exception:
+                logging.error(f"Could not login.")
+                return render_template('error.html')
+                
         return render_template('login.html')
 
     @app.route('/users')
