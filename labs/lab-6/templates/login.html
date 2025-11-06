@@ -7,8 +7,15 @@
     <body>
         <h1>Log In</h1>
         <div>
-        <!-- Create a log in form here -->
+        <form action="/login" method="POST">
+            <label for="Email">Email:</label><br>
+            <input type="email" name="Email" value="" required title="Please enter a valid email"><br>
 
+            <label for="Password">Password:</label><br>
+            <input type="password" name="Password" value="" required minlength="8" title="Please enter your password"><br><br>
+
+            <input type="submit">
+        </form>
         </div>
         
         <br>
