@@ -32,6 +32,9 @@ ENV/
 env.bak/
 venv.bak/
 
+# logs
+logs/
+
 # test
 .pytest_cache
 
